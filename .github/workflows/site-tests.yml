@@ -20,12 +20,13 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - name: Live Railway analytics smoke check
+      - name: Verify privacy release does not depend on retired Railway analytics
         run: |
-          set -euo pipefail
-          URL='https://pavel-chatbots-orders-production.up.railway.app'
-          curl -fsS --retry 5 --retry-delay 2 "$URL/healthz" | grep -q '"status": "ok"'
-          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://not-our-site.example' -H 'Content-Type: text/plain' --data '{"event":"page_view","page":"/","source":"other"}' "$URL/event")
-          test "$code" = '403'
-          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://pavelbots.tuqo.app' -H 'Content-Type: text/plain' --data '{"event":"page_view","page":"/","source":"other"}' "$URL/event")
-          test "$code" = '204'
+          node --input-type=module -e "
+          import fs from 'node:fs';
+          const policy = fs.readFileSync('dist/privacy/index.html','utf8');
+          const home = fs.readFileSync('dist/index.html','utf8');
+          if (!policy.includes('Куценко Павел Евгеньевич') || !policy.includes('Kutsenco-Pavel@yandex.ru')) process.exit(1);
+          if (policy.includes('[АДРЕС ДЛЯ ОБРАЩЕНИЙ]') || policy.includes('Черновая информационная страница')) process.exit(1);
+          if (home.includes('pavel-chatbots-orders-production.up.railway.app/event')) process.exit(1);
+          "
