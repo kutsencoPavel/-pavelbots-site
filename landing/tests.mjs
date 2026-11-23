@@ -24,6 +24,6 @@ assert.match(r('sitemap.xml'),/\/bot-dlya-zayavok\//);
 assert.match(r('index.html'),/href="\/bot-dlya-zapisi\/"/);
 assert.match(r('index.html'),/href="\/bot-dlya-zayavok\/"/);
 assert.match(r('bot-dlya-zapisi/index.html'),/актуальному расписанию/);
-assert.match(r('bot-dlya-zayavok/index.html'),/пошаговый опрос/);
+assert.match(r('bot-dlya-zayavok/index.html'),/[Пп]ошаговый опрос/);
 assert(!r('sitemap.xml').includes('privacy'));
 console.log('PASS — '+(pages.length+6)+' checks: pages, copy, robots, AI, sitemap, canonical, privacy');
