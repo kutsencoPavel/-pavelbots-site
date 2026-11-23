@@ -36,11 +36,18 @@ assert.match(r('privacy/index.html'),/Техническая статистик�
 assert.match(r('analytics.js'),/telegram_click/);
 assert.match(r('analytics.js'),/page_view/);
 
-// Production defaults to NO analytics until a current HTTPS collector is explicitly configured.
-execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'inherit',env:{...process.env,SITE_URL:'https://pavelbots.tuqo.app',SITE_ANALYTICS_ENDPOINT:''}});
-assert.doesNotMatch(r('index.html'),/PAVEL_ANALYTICS_ENDPOINT/);
-assert.doesNotMatch(r('index.html'),/pavel-chatbots-orders-production\.up\.railway\.app\/event/);
-assert.match(r('index.html'),/https:\/\/t\.me\/pavel_chatbots_bot/);
+// The Railway analytics-only service is the default collector on the actual Tuqo domain.
+const productionEnv={...process.env,SITE_URL:'https://pavelbots.tuqo.app'};
+delete productionEnv.SITE_ANALYTICS_ENDPOINT;
+execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'inherit',env:productionEnv});
+assert.match(r('index.html'),/PAVEL_ANALYTICS_ENDPOINT/);
+assert.match(r('index.html'),/pavel-chatbots-orders-production\.up\.railway\.app\/event/);
+assert.match(r('index.html'),/start=site/);
 assert.match(r('privacy/index.html'),/Права пользователей/);
 assert.doesNotMatch(r('privacy/index.html'),/Черновая информационная страница/);
-console.log('PASS — production privacy page and optional analytics disabled');
+
+// Explicit empty env disables telemetry without changing the site's HTML or bot CTA.
+execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'inherit',env:{...productionEnv,SITE_ANALYTICS_ENDPOINT:''}});
+assert.doesNotMatch(r('index.html'),/PAVEL_ANALYTICS_ENDPOINT/);
+assert.match(r('index.html'),/https:\/\/t\.me\/pavel_chatbots_bot/);
+console.log('PASS — analytics-only Railway collector, privacy and explicit opt-out');
