@@ -1,0 +1,8 @@
+{
+  "name": "pavel-bots-landing",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static SEO-first landing for chatbot development services in Russia",
+  "scripts": {"build": "node landing/build.mjs", "test": "node landing/tests.mjs"},
+  "engines": {"node": ">=20"}
+}
