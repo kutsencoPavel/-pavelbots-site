@@ -9,7 +9,7 @@ const configPath=path.join(root,'landing/site-url.txt');
 const raw=(process.env.SITE_URL|| (fs.existsSync(configPath)?fs.readFileSync(configPath,'utf8'):'')).trim().replace(/\/+$/,'');
 if(raw && !/^https:\/\/[a-z\d.-]+(?::\d+)?$/i.test(raw))throw Error('SITE_URL must be an HTTPS origin, without path');
 const SITE_URL=raw;
-const ANALYTICS_ENDPOINT=(process.env.SITE_ANALYTICS_ENDPOINT||'').trim();
+const ANALYTICS_ENDPOINT=(process.env.SITE_ANALYTICS_ENDPOINT|| (SITE_URL==='https://pavelbots.tuqo.app'?'https://pavel-chatbots-orders-production.up.railway.app/event':'')).trim();
 if(ANALYTICS_ENDPOINT) {
   const parsed=new URL(ANALYTICS_ENDPOINT);
   if(parsed.protocol!=='https:' || parsed.username || parsed.password || parsed.search || parsed.hash || !parsed.pathname.endsWith('/event')) {
