@@ -46,7 +46,7 @@
   track('page_view');
 
   document.addEventListener('click', function (event) {
-    const element = event.target.closest('a[href]');
+    const element = event.target?.closest?.('a[href]');
     if (!element) return;
     try {
       const url = new URL(element.href);
