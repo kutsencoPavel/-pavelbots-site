@@ -49,3 +49,15 @@ The GitHub Actions workflow `.github/workflows/indexnow.yml` runs after changes 
 ## Search intent content (2026-11-23)
 
 Added task-focused pages `/bot-dlya-zapisi/` and `/bot-dlya-zayavok/`, linked from the home page and footer and included in sitemap/llms.txt/IndexNow. They explain practical use cases, realistic limitations, basic workflow, and FAQs without invented pricing, reviews, or cases. `npm run build` still gates publication through tests.
+
+
+
+## Приватная аналитика через существующий Telegram-бот (опционально)
+
+Без платного счётчика, iframe и аналитических cookie. Файл `landing/analytics.js` **не публикуется и не исполняется**, пока не задана переменная сборки `SITE_ANALYTICS_ENDPOINT`. По умолчанию сайт вообще не отправляет события.
+
+Когда в существующем сервере бота будет доступен публичный HTTPS-адрес `/event`, для сборки можно указать `SITE_ANALYTICS_ENDPOINT=https://ваш-проверенный-домен/event`. Сборка откажет в URL без HTTPS. Включатся агрегированные события `page_view`, `telegram_click`, `brief_copy` (последнее только при успешном копировании); только допустимый путь страницы и категория источника. Ни текста заявок, ни полей формы, ни cookie, ни идентификаторов посетителей не отправляется. При сбоях аналитики CTA не блокируются.
+
+Тогда ссылки в Telegram получают параметр `?start=site`, чтобы бот мог помечать только явно начатые с сайта диалоги. Он хранит связку с Telegram ID в своей существующей базе на 30 дней для учёта реальных заявок и удаления по запросу. Перед активацией проверить текст страницы конфиденциальности и правила обработки данных.
+
+**Порядок без риска:** сначала PR и CI для двух репозиториев; затем отдельная проверка HTTPS и постоянного тома, затем включение сервера и тестовая отправка, только после этого — переменная `SITE_ANALYTICS_ENDPOINT` в Tuqo. Никогда не публикуйте ключи Telegram в JavaScript.
