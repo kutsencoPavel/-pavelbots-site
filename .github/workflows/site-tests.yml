@@ -20,7 +20,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - name: Verify privacy release does not depend on retired Railway analytics
+      - name: Verify analytics collector and privacy disclosures
         run: |
           node --input-type=module -e "
           import fs from 'node:fs';
@@ -28,5 +28,15 @@ jobs:
           const home = fs.readFileSync('dist/index.html','utf8');
           if (!policy.includes('Куценко Павел Евгеньевич') || !policy.includes('Kutsenco-Pavel@yandex.ru')) process.exit(1);
           if (policy.includes('[АДРЕС ДЛЯ ОБРАЩЕНИЙ]') || policy.includes('Черновая информационная страница')) process.exit(1);
-          if (home.includes('pavel-chatbots-orders-production.up.railway.app/event')) process.exit(1);
+          if (!home.includes('pavel-chatbots-orders-production.up.railway.app/event')) process.exit(1);
           "
+      - name: Verify deployed analytics-only collector without storing synthetic visits
+        run: |
+          set -euo pipefail
+          URL='https://pavel-chatbots-orders-production.up.railway.app'
+          curl -fsS --retry 5 --retry-delay 3 --max-time 15 "$URL/healthz" | grep -q '"status": "ok"'
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 -X POST -H 'Origin: https://not-pavel-studio.invalid' -H 'Content-Type: text/plain' --data '{"event":"page_view","page":"/","source":"direct"}' "$URL/event")
+          test "$code" = '403'
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 -X POST -H 'Origin: https://pavelbots.tuqo.app' -H 'Content-Type: text/plain' --data '{"event":"not_real","page":"/","source":"direct"}' "$URL/event")
+          test "$code" = '400'
+          echo "PASS live analytics-only relay reachable, secure and non-recording for invalid events"
