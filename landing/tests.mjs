@@ -35,3 +35,10 @@ assert.match(r('index.html'),/start=site/);
 assert.match(r('privacy/index.html'),/агрегированной статистики/);
 assert.match(r('analytics.js'),/telegram_click/);
 assert.match(r('analytics.js'),/page_view/);
+
+// Production URL activates the preconfigured collector without Tuqo environment edits.
+execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'inherit',env:{...process.env,SITE_URL:'https://pavelbots.tuqo.app',SITE_ANALYTICS_ENDPOINT:''}});
+assert.match(r('index.html'),/PAVEL_ANALYTICS_ENDPOINT/);
+assert.match(r('index.html'),/pavel-chatbots-orders-production\.up\.railway\.app\/event/);
+assert.match(r('index.html'),/start=site/);
+console.log('PASS — production collector and site attribution enabled');
