@@ -27,3 +27,11 @@ assert.match(r('bot-dlya-zapisi/index.html'),/актуальному распи�
 assert.match(r('bot-dlya-zayavok/index.html'),/[Пп]ошаговый опрос/);
 assert(!r('sitemap.xml').includes('privacy'));
 console.log('PASS — '+(pages.length+6)+' checks: pages, copy, robots, AI, sitemap, canonical, privacy');
+
+// Optional analytics: no tracker in default build; generated only with explicit HTTPS endpoint.
+execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'inherit',env:{...process.env,SITE_URL:'https://example.tuqo.app',SITE_ANALYTICS_ENDPOINT:'https://stats.example.test/event'}});
+assert.match(r('index.html'),/PAVEL_ANALYTICS_ENDPOINT/);
+assert.match(r('index.html'),/start=site/);
+assert.match(r('privacy/index.html'),/агрегированной статистики/);
+assert.match(r('analytics.js'),/telegram_click/);
+assert.match(r('analytics.js'),/page_view/);
