@@ -45,3 +45,7 @@ SITE_URL=https://your-site.tuqo.app npm run build
 ## IndexNow automation
 
 The GitHub Actions workflow `.github/workflows/indexnow.yml` runs after changes to the site code, builds and tests the pages, waits until `https://pavelbots.tuqo.app/deploy-revision.txt` matches the current source fingerprint, verifies the published IndexNow key, then sends the six public sitemap URLs to Bing and Yandex. If the Tuqo deployment is blocked or delayed, notifications are not sent. Google indexing is managed via Search Console, not IndexNow. Notifications do not guarantee indexing. A manual rerun is available via the workflow_dispatch trigger.
+
+## Search intent content (2026-11-23)
+
+Added task-focused pages `/bot-dlya-zapisi/` and `/bot-dlya-zayavok/`, linked from the home page and footer and included in sitemap/llms.txt/IndexNow. They explain practical use cases, realistic limitations, basic workflow, and FAQs without invented pricing, reviews, or cases. `npm run build` still gates publication through tests.
