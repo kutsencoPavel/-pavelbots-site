@@ -20,3 +20,12 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: Live Railway analytics smoke check
+        run: |
+          set -euo pipefail
+          URL='https://pavel-chatbots-orders-production.up.railway.app'
+          curl -fsS --retry 5 --retry-delay 2 "$URL/healthz" | grep -q '"status": "ok"'
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://not-our-site.example' -H 'Content-Type: text/plain' --data '{"event":"page_view","page":"/","source":"other"}' "$URL/event")
+          test "$code" = '403'
+          code=$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Origin: https://pavelbots.tuqo.app' -H 'Content-Type: text/plain' --data '{"event":"page_view","page":"/","source":"other"}' "$URL/event")
+          test "$code" = '204'
