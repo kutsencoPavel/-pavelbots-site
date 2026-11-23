@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'landing/build.mjs'
+      - 'landing/tests.mjs'
       - 'landing/styles.css'
       - 'landing/script.js'
       - 'landing/site-url.txt'
