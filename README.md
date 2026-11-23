@@ -41,3 +41,7 @@ SITE_URL=https://your-site.tuqo.app npm run build
 ## Контроль качества
 
 При каждом `npm run build` автоматически запускаются тесты (`prebuild`). Если проверка не пройдена, сборка завершается с ошибкой, а Tuqo не должен публиковать неисправную версию. Временный диагностический файл первого автодеплоя удалён из генератора.
+
+## IndexNow automation
+
+The GitHub Actions workflow `.github/workflows/indexnow.yml` runs after changes to the site code, builds and tests the pages, waits until `https://pavelbots.tuqo.app/deploy-revision.txt` matches the current source fingerprint, verifies the published IndexNow key, then sends the six public sitemap URLs to Bing and Yandex. If the Tuqo deployment is blocked or delayed, notifications are not sent. Google indexing is managed via Search Console, not IndexNow. Notifications do not guarantee indexing. A manual rerun is available via the workflow_dispatch trigger.

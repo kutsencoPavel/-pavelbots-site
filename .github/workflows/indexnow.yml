@@ -1,0 +1,33 @@
+name: IndexNow after Tuqo deployment
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'landing/build.mjs'
+      - 'landing/styles.css'
+      - 'landing/script.js'
+      - 'landing/site-url.txt'
+      - 'package.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: indexnow-prod
+  cancel-in-progress: true
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify and build
+        run: |
+          npm ci
+          npm run build
+      - name: Validate payload offline
+        run: node landing/indexnow.mjs --dry-run
+      - name: Wait for published revision and notify Bing and Yandex
+        run: node landing/indexnow.mjs
