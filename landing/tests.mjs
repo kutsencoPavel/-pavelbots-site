@@ -7,6 +7,7 @@ execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'inherit',en
 const r=(p)=>fs.readFileSync(path.join(root,'dist',p),'utf8');
 const pages=['index.html','telegram/index.html','max/index.html','vk/index.html','whatsapp/index.html','ai-bots/index.html','privacy/index.html'];
 for(const p of pages){const html=r(p);assert.match(html,/<html lang="ru">/);assert.match(html,/<title>[^<]+<\/title>/);assert.match(html,/<meta name="description"/);assert.match(html,/<h1>/);assert.match(html,/application\/ld\+json/);assert.match(html,/pavel_chatbots_bot/);assert.doesNotMatch(html,/href="\s*#"/);}
+assert.match(r('deploy-check.txt'),/PAVELBOTS_GITCD_20261123_A1/);
 assert.match(r('robots.txt'),/OAI-SearchBot/);
 assert.match(r('robots.txt'),/Yandex/);
 assert.match(r('llms.txt'),/MAX-боты/);

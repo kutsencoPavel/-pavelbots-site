@@ -37,3 +37,8 @@ SITE_URL=https://your-site.tuqo.app npm run build
 
 ## IndexNow
 При появлении настоящего домена генератор создаёт файл `<key>.txt` и `indexnow-info.txt` в `dist/`. После публикации проверьте доступность ключа в корне сайта и отправьте URL по официальной документации Яндекс Вебмастера / Bing Webmaster Tools.
+
+## Проверка Git CD
+
+После автоматического деплоя открывайте `https://pavelbots.tuqo.app/deploy-check.txt`.
+Если там видна строка `PAVELBOTS_GITCD_20261123_A1`, на опубликованный сайт попала GitHub-сборка, а не только старый ZIP-деплой.
