@@ -26,10 +26,13 @@ const bot=ANALYTICS_ENDPOINT?'https://t.me/pavel_chatbots_bot?start=site':'https
 // 'v1' добавляет источник и страницу. Включать ТОЛЬКО после поддержки формата в боте.
 const START_PARAMS=(process.env.SITE_START_PARAMS ?? 'legacy').trim();
 if(!['legacy','v1'].includes(START_PARAMS))throw Error('SITE_START_PARAMS must be legacy or v1');
-// Запасной канал связи. Пусто = выключен. Включать после решения владельца и правки политики.
-const CONTACT_EMAIL=(process.env.SITE_CONTACT_EMAIL ?? '').trim();
+// Запасной канал связи. По умолчанию выключен. Включать только после решения владельца и правки политики:
+// переменной SITE_CONTACT_EMAIL или файлом landing/contact-email.txt (одна строка с адресом).
+const contactFile=path.join(root,'landing','contact-email.txt');
+const CONTACT_EMAIL=(process.env.SITE_CONTACT_EMAIL ?? (fs.existsSync(contactFile)?fs.readFileSync(contactFile,'utf8'):'')).trim();
 if(CONTACT_EMAIL && !/^[^\s@<>"'?&]+@[^\s@<>"'?&]+\.[a-z]{2,}$/i.test(CONTACT_EMAIL))throw Error('Invalid SITE_CONTACT_EMAIL');
-const emailFallback=CONTACT_EMAIL?`<p class="notice">Не открывается Telegram? Напишите на <a href="mailto:${CONTACT_EMAIL}?subject=%D0%97%D0%B0%D1%8F%D0%B2%D0%BA%D0%B0%20%D0%BD%D0%B0%20%D1%87%D0%B0%D1%82-%D0%B1%D0%BE%D1%82%D0%B0">${CONTACT_EMAIL}</a> — можно вставить туда скопированное ТЗ.</p>`:'';
+const mailHref=`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Заявка на чат-бота')}`;
+const emailFallback=CONTACT_EMAIL?`<div class="mail-fallback"><p class="notice">Не открывается Telegram? Напишите на <a href="${mailHref}">${CONTACT_EMAIL}</a>.</p><a class="btn secondary" data-mail-brief href="${mailHref}">Подготовить письмо с ТЗ</a><p class="tiny">Откроется ваша почтовая программа. Письмо уйдёт, только когда вы сами его отправите. <a href="/privacy/">Об обработке данных</a>.</p></div>`:'';
 const write=(relative,text)=>{const p=path.join(dist,relative);fs.mkdirSync(path.dirname(p),{recursive:true});fs.writeFileSync(p,text,'utf8');};
 const esc=(s)=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const abs=(url)=>SITE_URL+url;

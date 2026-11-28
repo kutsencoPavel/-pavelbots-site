@@ -6,7 +6,8 @@ const root=path.resolve('.');
 // Тесты не должны зависеть от настроек окружения хостинга.
 const hostStartParams=process.env.SITE_START_PARAMS, hostEmail=process.env.SITE_CONTACT_EMAIL;
 delete process.env.SITE_START_PARAMS; delete process.env.SITE_CONTACT_EMAIL;
-execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'inherit',env:{...process.env,SITE_URL:''}});
+// SITE_CONTACT_EMAIL='' держит канал выключенным в проверках, даже когда есть landing/contact-email.txt.
+execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'inherit',env:{...process.env,SITE_URL:'',SITE_CONTACT_EMAIL:''}});
 const r=(p)=>fs.readFileSync(path.join(root,'dist',p),'utf8');
 const pages=['index.html','telegram/index.html','max/index.html','vk/index.html','whatsapp/index.html','ai-bots/index.html','bot-dlya-zapisi/index.html','bot-dlya-zayavok/index.html','privacy/index.html'];
 for(const p of pages){const html=r(p);assert.match(html,/<html lang="ru">/);assert.match(html,/<title>[^<]+<\/title>/);assert.match(html,/<meta name="description"/);assert.match(html,/<h1>/);assert.match(html,/application\/ld\+json/);assert.match(html,/pavel_chatbots_bot/);assert.doesNotMatch(html,/href="\s*#"/);}
@@ -56,7 +57,7 @@ assert.match(r('index.html'),/https:\/\/t\.me\/pavel_chatbots_bot/);
 console.log('PASS — analytics-only Railway collector, privacy and explicit opt-out');
 
 // SEO-целостность всех страниц на боевом адресе.
-const build=(extra={})=>execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'pipe',env:{...productionEnv,...extra}});
+const build=(extra={})=>execFileSync(process.execPath,['landing/build.mjs'],{cwd:root,stdio:'pipe',env:{...productionEnv,SITE_CONTACT_EMAIL:'',...extra}});
 build();
 const locs=[...r('sitemap.xml').matchAll(/<loc>([^<]+)<\/loc><lastmod>\d{4}-\d\d-\d\d<\/lastmod>/g)].map(m=>new URL(m[1]).pathname);
 const htmlFiles=fs.readdirSync(path.join(root,'dist'),{recursive:true}).map(String).filter(f=>f.endsWith('index.html'));
@@ -101,10 +102,12 @@ const notFound=r('404.html');
 assert.match(notFound,/content="noindex,follow"/);
 assert.doesNotMatch(notFound,/rel="canonical"|ld\+json/);
 assert.match(r('index.html'),/data-start-params="legacy"/);
-assert.doesNotMatch(r('index.html'),/mailto:/);
+assert.doesNotMatch(r('index.html'),/mailto:|data-mail-brief/);
 build({SITE_START_PARAMS:'v1',SITE_CONTACT_EMAIL:'owner@example.com'});
 assert.match(r('index.html'),/data-start-params="v1"/);
-assert.match(r('index.html'),/mailto:owner@example\.com/);
+assert.match(r('index.html'),/mailto:owner@example\.com\?subject=/);
+assert.match(r('index.html'),/data-mail-brief/);
+assert.match(r('index.html'),/Письмо уйдёт, только когда вы сами его отправите/);
 assert.throws(()=>build({SITE_START_PARAMS:'wrong'}));
 assert.throws(()=>build({SITE_CONTACT_EMAIL:'a"><script>@x.com'}));
 console.log('PASS — SEO integrity for '+locs.length+' pages, links, 404, feature flags');
