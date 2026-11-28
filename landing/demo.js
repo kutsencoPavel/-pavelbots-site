@@ -102,5 +102,13 @@
       reset(tab.dataset.simTab);
     });
   });
+  // Пройденный пример подставляет в форму подходящую задачу. Платформу клиент выбирает сам.
+  const goals = { salon: 'Запись клиентов', auto: 'Приём заявок', tutor: 'Запись клиентов' };
+  root.querySelector('[data-sim-brief]')?.addEventListener('click', () => {
+    const radio = document.querySelector('[data-brief] input[name="goal"][value="' + goals[current] + '"]');
+    if (!radio) return;
+    radio.checked = true;
+    radio.dispatchEvent(new Event('input', { bubbles: true }));
+  });
   reset('salon');
 })();

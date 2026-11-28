@@ -68,18 +68,24 @@
     nav.addEventListener('focusout',e=>{if(isOpen()&&e.relatedTarget&&!nav.contains(e.relatedTarget)&&!menu.contains(e.relatedTarget))close();});
   }
   if(menu && nav){menu.addEventListener('click',()=>{const o=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(o));});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false')}));}
+  // Выпадающие разделы меню: Esc и щелчок мимо закрывают их.
+  const groups=[...document.querySelectorAll('.navgroup')];
+  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;groups.filter(g=>g.open).forEach(g=>{g.open=false;if(!nav||getComputedStyle(nav).display!=='none')g.querySelector('summary').focus();});});
+  document.addEventListener('click',e=>{groups.forEach(g=>{if(g.open&&(!g.contains(e.target)||e.target.closest('a')))g.open=false;});});
   const form=document.querySelector('[data-brief]');if(!form)return;
   const output=document.querySelector('[data-output]');const copy=document.querySelector('[data-copy]');
   function makeBrief(){const p=form.elements.platform.value;const g=form.elements.goal.value;const task=form.elements.task.value.trim().replace(/\s+/g,' ').slice(0,900);return 'Здравствуйте! Хочу заказать чат-бота.\nПлатформа: '+p+'\nЗадача: '+g+(task?'\nПодробности: '+task:'')+'\nИсточник: сайт Pavel Bot Studio';}
   const status=form.querySelector('[data-form-status]');
   const say=t=>{if(status)status.textContent=t;};
-  const manual='Не получилось скопировать автоматически. Выделите текст ТЗ выше и скопируйте его вручную.';
+  const manual='Не получилось скопировать автоматически. Выделите текст заявки и скопируйте его вручную.';
+  const preview=form.querySelector('.preview');
+  const reveal=()=>{if(preview)preview.open=true;};
   function update(){output.textContent=makeBrief();}
   // После правки прежнее сообщение о копировании больше не относится к тексту.
-  form.addEventListener('input',()=>{update();say('');copy.textContent='Скопировать ТЗ';});update();
-  copy.addEventListener('click',async()=>{const data=makeBrief();try{await navigator.clipboard.writeText(data);copy.textContent='Скопировано ✓';say('ТЗ скопировано. Вставьте его в диалог с ботом.');window.pavelTrack?.('brief_copy');setTimeout(()=>copy.textContent='Скопировать ТЗ',2400)}catch(e){const range=document.createRange();range.selectNodeContents(output);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);copy.textContent='Выделено — скопируйте';say('Текст выделен. Скопируйте его вручную.');}});
+  form.addEventListener('input',()=>{update();say('');copy.textContent='Только скопировать';});update();
+  copy.addEventListener('click',async()=>{const data=makeBrief();try{await navigator.clipboard.writeText(data);copy.textContent='Скопировано ✓';say('Заявка скопирована. Вставьте её в диалог с ботом и отправьте.');window.pavelTrack?.('brief_copy');setTimeout(()=>copy.textContent='Только скопировать',2400)}catch(e){reveal();const range=document.createRange();range.selectNodeContents(output);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);copy.textContent='Выделено — скопируйте';say('Текст выделен. Скопируйте его вручную.');}});
   // Переход в бот заодно копирует ТЗ. Ссылка открывается в любом случае.
   form.parentElement.querySelector('[data-bot-open]')?.addEventListener('click',()=>{
-    try{navigator.clipboard.writeText(makeBrief()).then(()=>{say('ТЗ скопировано. Вставьте его в диалог с ботом и отправьте.');window.pavelTrack?.('brief_copy');}).catch(()=>say(manual));}catch(_){say(manual);}
+    try{navigator.clipboard.writeText(makeBrief()).then(()=>{say('Заявка скопирована. Вставьте её в диалог с ботом и отправьте.');window.pavelTrack?.('brief_copy');}).catch(()=>{reveal();say(manual);});}catch(_){reveal();say(manual);}
   });
 })();
