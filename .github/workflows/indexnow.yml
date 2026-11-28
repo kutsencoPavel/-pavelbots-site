@@ -7,6 +7,10 @@ on:
       - 'landing/tests.mjs'
       - 'landing/styles.css'
       - 'landing/script.js'
+      - 'landing/analytics.js'
+      - 'landing/content.mjs'
+      - 'landing/privacy.html'
+      - 'landing/og.png'
       - 'landing/site-url.txt'
       - 'package.json'
   workflow_dispatch:
