@@ -618,5 +618,10 @@ details.form-card[open]>summary.form-head{margin-bottom:16px}
 .order-quick .how-send b{font-weight:700}
 .author .checks+p{margin-top:16px}
 .author-mark{width:clamp(72px,9vw,112px);font-size:clamp(2.2rem,4vw,3.2rem)}
-@media (max-width:620px){.term dt{font-size:.75rem}.term dd span,.bw-note{font-size:.875rem}.author-mark{width:72px;font-size:2rem}}
+@media (max-width:620px){.term dt{font-size:.8125rem;letter-spacing:0;hyphens:auto}.term dd span,.bw-note{font-size:.875rem}.author-mark{width:72px;font-size:2rem}}
 @media (scripting:none){.mobile-cta{display:none}}
+/* Финал анкеты: кнопка заказа стоит над сводкой, чтобы быть видимой и на коротком экране. */
+.botwalk.bw-done{display:flex;flex-direction:column}
+.botwalk.bw-done .bw-replies{order:1;border-radius:var(--radius) var(--radius) 0 0;border-top:0;border-bottom:1px solid var(--line)}
+.botwalk.bw-done .bw-screen{order:2;border-radius:0 0 var(--radius) var(--radius)}
+.botwalk.bw-done .bw-note{order:3}

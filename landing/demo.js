@@ -162,12 +162,19 @@
     });
     return dl;
   };
-  function finishRender(focus, full) {
+  function finishRender(focus, full, done) {
+    root.classList.toggle('bw-done', Boolean(done));
     const wasFull = root.classList.contains('bw-full');
     root.classList.toggle('bw-full', Boolean(full));
     screen.scrollTop = 0;
     if (focus && (full || wasFull)) root.scrollIntoView({ block: 'start' });
-    if (focus) replies.querySelector('button')?.focus({ preventScroll: true });
+    if (!focus) return;
+    if (full) {
+      // Итог читают сверху: фокус на первой реплике, а не на кнопке под списком.
+      const heading = screen.firstElementChild;
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    } else replies.querySelector('button')?.focus({ preventScroll: true });
   }
   function question(focus) {
     const q = questions[step];
@@ -220,7 +227,7 @@
     next.appendChild(link);
     replies.appendChild(next);
     replies.appendChild(button('Пройти ещё раз', 'reply', () => start(true)));
-    finishRender(focus, true);
+    finishRender(focus, true, true);
   }
   function start(focus) {
     step = 0;
