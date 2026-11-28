@@ -84,6 +84,19 @@ for(const pathname of locs){
   if(pathname!=='/privacy/')assert.ok(analyticsJs.includes("'"+pathname+"'"),'analytics allowlist: '+pathname);
 }
 assert.ok(fs.existsSync(path.join(root,'dist/og.png')));
+// Демонстрации всегда помечены; цены не публикуются; ссылки на бота остаются прежними.
+for(const pathname of locs){
+  const html=r(pathname.slice(1)+'index.html');
+  const demoCount=(html.match(/<figure class="demo">/g)||[]).length;
+  assert.equal((html.match(/Демонстрация, не кейс клиента/g)||[]).length,demoCount,'unlabelled demo: '+pathname);
+  if(demoCount)assert.match(html,/придуманы для иллюстрации/);
+  if(pathname!=='/privacy/')assert.doesNotMatch(html,/₽|\d\s*руб/,'price published: '+pathname);
+  for(const [,link] of html.matchAll(/href="(https:\/\/t\.me\/[^"]+)"/g))
+    assert.ok(link==='https://t.me/pavel_chatbots_bot?start=site'||(pathname==='/privacy/'&&link==='https://t.me/pavel_chatbots_bot'),'bot link changed: '+pathname);
+}
+assert.equal((r('index.html').match(/<figure class="demo">/g)||[]).length,3);
+assert.match(r('index.html'),/id="examples"/);
+assert.match(r('index.html'),/name="yandex-verification" content="57833afd1e8f909f"/);
 const notFound=r('404.html');
 assert.match(notFound,/content="noindex,follow"/);
 assert.doesNotMatch(notFound,/rel="canonical"|ld\+json/);
