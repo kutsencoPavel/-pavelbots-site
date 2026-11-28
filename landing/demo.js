@@ -167,6 +167,7 @@
     if (focus) replies.querySelector('button')?.focus({ preventScroll: true });
   }
   function question(focus) {
+    root.classList.remove('bw-done');
     const q = questions[step];
     screen.textContent = '';
     replies.textContent = '';
@@ -208,7 +209,16 @@
     owner.appendChild(list([0, 1, 6, 7, 8].map((i) => [questions[i].label, answers[i], i])));
     owner.appendChild(el('p', '', 'И полное техническое задание отдельным файлом.'));
     screen.appendChild(owner);
+    const next = el('div', 'bw-next');
+    next.appendChild(el('p', '', 'Теперь опишите свою задачу — хватит двух-трёх предложений: «Старт» → «Связаться».'));
+    const link = el('a', 'btn', 'Написать в Telegram');
+    link.href = root.dataset.bot;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    next.appendChild(link);
+    replies.appendChild(next);
     replies.appendChild(button('Пройти ещё раз', 'reply', () => start(true)));
+    root.classList.add('bw-done');
     finishRender(focus);
   }
   function start(focus) {
