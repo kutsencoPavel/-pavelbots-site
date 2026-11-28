@@ -48,7 +48,19 @@
     });
   }
 
+  // Нижняя панель не дублирует кнопки первого экрана и не перекрывает форму и подвал.
+  const cta=document.querySelector('[data-mobile-cta]');
+  if(cta && 'IntersectionObserver' in window){
+    const seen=new Set();
+    const io=new IntersectionObserver(items=>{
+      items.forEach(i=>i.isIntersecting?seen.add(i.target):seen.delete(i.target));
+      cta.classList.toggle('hidden',seen.size>0);
+    });
+    document.querySelectorAll('.hero .actions, .article-header .actions, [data-brief], .footer').forEach(n=>io.observe(n));
+  }
+
   const menu=document.querySelector('[data-menu]'); const nav=document.querySelector('[data-nav]');
+  if(menu && nav){document.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav.classList.contains('open')){nav.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.focus();}});}
   if(menu && nav){menu.addEventListener('click',()=>{const o=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(o));});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menu.setAttribute('aria-expanded','false')}));}
   const form=document.querySelector('[data-brief]');if(!form)return;
   const output=document.querySelector('[data-output]');const copy=document.querySelector('[data-copy]');
@@ -56,7 +68,10 @@
   function update(){output.textContent=makeBrief();} form.addEventListener('input',update);update();
   copy.addEventListener('click',async()=>{const data=makeBrief();try{await navigator.clipboard.writeText(data);copy.textContent='Скопировано ✓';window.pavelTrack?.('brief_copy');setTimeout(()=>copy.textContent='Скопировать ТЗ',2400)}catch(e){const range=document.createRange();range.selectNodeContents(output);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);copy.textContent='Выделено — скопируйте';}});
   // Переход в бот заодно копирует ТЗ. Ссылка открывается в любом случае.
+  const status=form.querySelector('[data-form-status]');
+  const say=t=>{if(status)status.textContent=t;};
+  const manual='Не получилось скопировать автоматически. Выделите текст ТЗ выше и скопируйте его вручную.';
   form.parentElement.querySelector('[data-bot-open]')?.addEventListener('click',()=>{
-    try{navigator.clipboard.writeText(makeBrief()).then(()=>window.pavelTrack?.('brief_copy')).catch(()=>{});}catch(_){}
+    try{navigator.clipboard.writeText(makeBrief()).then(()=>{say('ТЗ скопировано. Вставьте его в диалог с ботом и отправьте.');window.pavelTrack?.('brief_copy');}).catch(()=>say(manual));}catch(_){say(manual);}
   });
 })();
