@@ -22,7 +22,7 @@ h2{font-size:clamp(1.75rem,1.25rem + 1.9vw,2.75rem)}
 h3{font-size:1.2rem;line-height:1.25;letter-spacing:-.012em}
 p{margin:0 0 1em;color:var(--muted)}
 i{font-style:normal}
-.container{width:min(100% - 40px,var(--max));margin-inline:auto;position:relative}
+.container{width:calc(100% - 40px);max-width:var(--max);margin:0 auto;position:relative}
 .skip{position:absolute;left:12px;top:-80px;z-index:100;background:var(--ink);color:#fff;padding:10px 16px;border-radius:var(--radius-s)}
 .skip:focus{top:10px}
 .ico{width:30px;height:30px;color:var(--accent)}
@@ -54,7 +54,7 @@ a:hover>.more i{transform:translateX(4px)}
 .navlinks a:not(.btn){padding:10px 0;color:var(--ink-2)}
 .navlinks a:not(.btn):hover{color:var(--accent)}
 .mobile-menu{display:none;align-items:center;gap:9px;min-height:44px;padding:8px 14px;background:var(--surface);border:1px solid var(--line);border-radius:999px;font-size:.92rem;font-weight:600}
-.burger{width:15px;height:10px;border-block:2px solid currentColor;position:relative}
+.burger{width:15px;height:10px;border-top:2px solid currentColor;border-bottom:2px solid currentColor;position:relative}
 .burger:after{content:"";position:absolute;left:0;right:0;top:2px;height:2px;background:currentColor}
 @media (max-width:1060px){
   .mobile-menu{display:inline-flex}
@@ -237,7 +237,7 @@ a:hover>.more i{transform:translateX(4px)}
 .breadcrumbs a{color:var(--accent-dark);display:inline-block;padding:6px 0}
 .notice{margin:26px 0 0;max-width:52em;padding:14px 18px;border-radius:var(--radius-s);background:var(--warn-soft);color:var(--warn);font-size:.94rem}
 .notice a{color:var(--warn)}
-.article-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:56px;align-items:start;padding-block:clamp(40px,6vw,72px)}
+.article-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:56px;align-items:start;padding-top:clamp(40px,6vw,72px);padding-bottom:clamp(40px,6vw,72px)}
 .prose{min-width:0;max-width:780px}
 .prose h2{font-size:clamp(1.45rem,1.2rem + 1vw,2rem);margin:1.9em 0 .65em}
 .prose>h2:first-child{margin-top:0}
@@ -283,7 +283,7 @@ a:hover>.more i{transform:translateX(4px)}
 }
 @media (max-width:920px){
   .hero-grid,.form-layout,.faq-layout,.split,.article-wrap{grid-template-columns:minmax(0,1fr)}
-  .sim{width:100%;max-width:520px;margin-inline:auto}
+  .sim{width:100%;max-width:520px;margin:0 auto}
   .faq-layout{gap:0}
   .split{gap:8px}
   .sidecard{position:static}

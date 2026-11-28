@@ -11,7 +11,7 @@ on:
       - 'landing/content.mjs'
       - 'landing/ui.mjs'
       - 'landing/demo.js'
-      - 'landing/fonts/**'
+      - 'landing/fonts/*.woff'
       - 'landing/privacy.html'
       - 'landing/og.png'
       - 'landing/site-url.txt'
