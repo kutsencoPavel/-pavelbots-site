@@ -2,7 +2,7 @@
 (function () {
   const endpoint = window.PAVEL_ANALYTICS_ENDPOINT;
   if (typeof endpoint !== 'string' || !endpoint.startsWith('https://')) return;
-  // Новые страницы начнут учитываться, когда сборщик добавит их в свой список (см. README).
+  // Новые страницы начнут учитываться, когда сборщик добавит их в свой список (см. landing/BOT_INTEGRATION.md).
   const allowed = new Set([
     '/', '/telegram/', '/max/', '/vk/', '/whatsapp/',
     '/ai-bots/', '/bot-dlya-zapisi/', '/bot-dlya-zayavok/',
