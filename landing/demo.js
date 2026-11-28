@@ -162,12 +162,14 @@
     });
     return dl;
   };
-  function finishRender(focus) {
+  function finishRender(focus, full) {
+    const wasFull = root.classList.contains('bw-full');
+    root.classList.toggle('bw-full', Boolean(full));
     screen.scrollTop = 0;
+    if (focus && (full || wasFull)) root.scrollIntoView({ block: 'start' });
     if (focus) replies.querySelector('button')?.focus({ preventScroll: true });
   }
   function question(focus) {
-    root.classList.remove('bw-done');
     const q = questions[step];
     screen.textContent = '';
     replies.textContent = '';
@@ -197,7 +199,7 @@
     screen.appendChild(list(questions.map((q, i) => [q.label, answers[i], i]), (i) => { step = i; editing = true; question(true); }));
     replies.appendChild(button('✓ Отправить заявку (демо)', 'reply send', () => done(true)));
     replies.appendChild(button('← Назад', 'reply back', () => { step = total - 1; question(true); }));
-    finishRender(focus);
+    finishRender(focus, true);
   }
   function done(focus) {
     screen.textContent = '';
@@ -218,8 +220,7 @@
     next.appendChild(link);
     replies.appendChild(next);
     replies.appendChild(button('Пройти ещё раз', 'reply', () => start(true)));
-    root.classList.add('bw-done');
-    finishRender(focus);
+    finishRender(focus, true);
   }
   function start(focus) {
     step = 0;
