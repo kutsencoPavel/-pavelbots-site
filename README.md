@@ -44,7 +44,7 @@ SITE_URL=https://your-site.tuqo.app npm run build
 
 ## IndexNow automation
 
-The GitHub Actions workflow `.github/workflows/indexnow.yml` runs after changes to the site code, builds and tests the pages, waits until `https://pavelbots.tuqo.app/deploy-revision.txt` matches the current source fingerprint, verifies the published IndexNow key, then sends the six public sitemap URLs to Bing and Yandex. If the Tuqo deployment is blocked or delayed, notifications are not sent. Google indexing is managed via Search Console, not IndexNow. Notifications do not guarantee indexing. A manual rerun is available via the workflow_dispatch trigger.
+The GitHub Actions workflow `.github/workflows/indexnow.yml` runs after changes to the site code, builds and tests the pages, waits until `https://pavelbots.tuqo.app/deploy-revision.txt` matches the current source fingerprint, verifies the published IndexNow key, then sends all public sitemap URLs to Bing and Yandex. If the Tuqo deployment is blocked or delayed, notifications are not sent. Google indexing is managed via Search Console, not IndexNow. Notifications do not guarantee indexing. A manual rerun is available via the workflow_dispatch trigger.
 
 ## Search intent content (2026-11-23)
 
@@ -61,3 +61,7 @@ Added task-focused pages `/bot-dlya-zapisi/` and `/bot-dlya-zayavok/`, linked fr
 Тогда ссылки в Telegram получают параметр `?start=site`, чтобы бот мог помечать только явно начатые с сайта диалоги. Он хранит связку с Telegram ID в своей существующей базе на 30 дней для учёта реальных заявок и удаления по запросу. Перед активацией проверить текст страницы конфиденциальности и правила обработки данных.
 
 **Порядок без риска:** сначала PR и CI для двух репозиториев; затем отдельная проверка HTTPS и постоянного тома, затем включение сервера и тестовая отправка, только после этого — переменная `SITE_ANALYTICS_ENDPOINT` в Tuqo. Никогда не публикуйте ключи Telegram в JavaScript.
+
+## Изменения 2026-11-28
+Новые посадочные: `/perenos-bota-v-max/`, `/bot-dlya-salona-krasoty/`, `/bot-dlya-avtoservisa/` (тексты — `landing/content.mjs`). Флаги сборки, по умолчанию выключены: `SITE_START_PARAMS=v1` и `SITE_CONTACT_EMAIL`. Перед включением прочитайте `landing/BOT_INTEGRATION.md`.
+

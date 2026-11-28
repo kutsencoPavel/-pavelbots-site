@@ -2,29 +2,17 @@
 (function () {
   const endpoint = window.PAVEL_ANALYTICS_ENDPOINT;
   if (typeof endpoint !== 'string' || !endpoint.startsWith('https://')) return;
+  // Новые страницы начнут учитываться, когда сборщик добавит их в свой список (см. README).
   const allowed = new Set([
     '/', '/telegram/', '/max/', '/vk/', '/whatsapp/',
-    '/ai-bots/', '/bot-dlya-zapisi/', '/bot-dlya-zayavok/'
+    '/ai-bots/', '/bot-dlya-zapisi/', '/bot-dlya-zayavok/',
+    '/perenos-bota-v-max/', '/bot-dlya-salona-krasoty/', '/bot-dlya-avtoservisa/'
   ]);
   const page = window.location.pathname;
   if (!allowed.has(page)) return;
 
-  function source() {
-    if (!document.referrer) return 'direct';
-    try {
-      const host = new URL(document.referrer).hostname.toLowerCase();
-      if (host === location.hostname) return 'direct';
-      if (host === 'google.com' || host.endsWith('.google.com') || host.startsWith('google.')) return 'google';
-      if (host === 'yandex.ru' || host.endsWith('.yandex.ru') || host.startsWith('yandex.')) return 'yandex';
-      if (host === 'bing.com' || host.endsWith('.bing.com')) return 'bing';
-      if (/^(t\.me|telegram\.org|vk\.com|m\.vk\.com|instagram\.com|l\.instagram\.com|facebook\.com|m\.facebook\.com)$/.test(host)) return 'social';
-      return 'other';
-    } catch (_) {
-      return 'other';
-    }
-  }
-
-  const currentSource = source();
+  // Категорию определяет script.js; набор значений прежний.
+  const currentSource = window.pavelSource || 'direct';
   function track(event) {
     if (!['page_view', 'telegram_click', 'brief_copy'].includes(event)) return;
     const body = JSON.stringify({ event, page, source: currentSource });
