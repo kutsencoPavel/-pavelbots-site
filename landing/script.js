@@ -56,7 +56,7 @@
       items.forEach(i=>i.isIntersecting?seen.add(i.target):seen.delete(i.target));
       cta.classList.toggle('hidden',seen.size>0);
     });
-    document.querySelectorAll('.hero .actions, .article-header .actions, [data-sim], [data-brief], .footer').forEach(n=>io.observe(n));
+    document.querySelectorAll('.hero .actions, .article-header .actions, [data-sim], [data-botwalk], .order-quick, [data-brief], .footer').forEach(n=>io.observe(n));
   }
 
   const menu=document.querySelector('[data-menu]'); const nav=document.querySelector('[data-nav]');
@@ -73,8 +73,13 @@
   document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;groups.filter(g=>g.open).forEach(g=>{g.open=false;if(!nav||getComputedStyle(nav).display!=='none')g.querySelector('summary').focus();});});
   document.addEventListener('click',e=>{groups.forEach(g=>{if(g.open&&(!g.contains(e.target)||e.target.closest('a')))g.open=false;});});
   const form=document.querySelector('[data-brief]');if(!form)return;
+  // Форма свёрнута: переход по ссылке на неё раскрывает блок.
+  const box=form.closest('details');
+  const openBox=()=>{if(box&&location.hash==='#brief-form')box.open=true;};
+  document.addEventListener('click',e=>{if(box&&e.target.closest('a[href="#brief-form"]'))box.open=true;});
+  window.addEventListener('hashchange',openBox);openBox();
   const output=document.querySelector('[data-output]');const copy=document.querySelector('[data-copy]');
-  function makeBrief(){const p=form.elements.platform.value;const g=form.elements.goal.value;const task=form.elements.task.value.trim().replace(/\s+/g,' ').slice(0,900);return 'Здравствуйте! Хочу заказать чат-бота.\nПлатформа: '+p+'\nЗадача: '+g+(task?'\nПодробности: '+task:'')+'\nИсточник: сайт Pavel Bot Studio';}
+  function makeBrief(){const p=form.elements.platform.value;const g=form.elements.goal.value;const task=form.elements.task.value.trim().replace(/\s+/g,' ').slice(0,500);return 'Здравствуйте! Хочу заказать чат-бота.\nПлатформа: '+p+'\nЗадача: '+g+(task?'\nПодробности: '+task:'')+'\nИсточник: сайт Pavel Bot Studio';}
   const status=form.querySelector('[data-form-status]');
   const say=t=>{if(status)status.textContent=t;};
   const manual='Не получилось скопировать автоматически. Выделите текст заявки и скопируйте его вручную.';
@@ -83,9 +88,9 @@
   function update(){output.textContent=makeBrief();}
   // После правки прежнее сообщение о копировании больше не относится к тексту.
   form.addEventListener('input',()=>{update();say('');copy.textContent='Только скопировать';});update();
-  copy.addEventListener('click',async()=>{const data=makeBrief();try{await navigator.clipboard.writeText(data);copy.textContent='Скопировано ✓';say('Заявка скопирована. Вставьте её в диалог с ботом и отправьте.');window.pavelTrack?.('brief_copy');setTimeout(()=>copy.textContent='Только скопировать',2400)}catch(e){reveal();const range=document.createRange();range.selectNodeContents(output);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);copy.textContent='Выделено — скопируйте';say('Текст выделен. Скопируйте его вручную.');}});
+  copy.addEventListener('click',async()=>{const data=makeBrief();try{await navigator.clipboard.writeText(data);copy.textContent='Скопировано ✓';say('Текст скопирован. В боте нажмите «Связаться», вставьте его и отправьте.');window.pavelTrack?.('brief_copy');setTimeout(()=>copy.textContent='Только скопировать',2400)}catch(e){reveal();const range=document.createRange();range.selectNodeContents(output);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);copy.textContent='Выделено — скопируйте';say('Текст выделен. Скопируйте его вручную.');}});
   // Переход в бот заодно копирует ТЗ. Ссылка открывается в любом случае.
   form.parentElement.querySelector('[data-bot-open]')?.addEventListener('click',()=>{
-    try{navigator.clipboard.writeText(makeBrief()).then(()=>{say('Заявка скопирована. Вставьте её в диалог с ботом и отправьте.');window.pavelTrack?.('brief_copy');}).catch(()=>{reveal();say(manual);});}catch(_){reveal();say(manual);}
+    try{navigator.clipboard.writeText(makeBrief()).then(()=>{say('Текст скопирован. В боте нажмите «Связаться», вставьте его и отправьте.');window.pavelTrack?.('brief_copy');}).catch(()=>{reveal();say(manual);});}catch(_){reveal();say(manual);}
   });
 })();

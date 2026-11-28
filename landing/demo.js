@@ -112,3 +112,110 @@
   });
   reset('salon');
 })();
+
+// Демонстрация анкеты нашего бота: те же 9 вопросов и порядок шагов. Без сети, хранения и аналитики.
+(function () {
+  const root = document.querySelector('[data-botwalk]');
+  if (!root) return;
+  const screen = root.querySelector('[data-bw-screen]');
+  const replies = root.querySelector('[data-bw-replies]');
+  const progress = root.querySelector('[data-bw-progress]');
+  const questions = [
+    { label: 'Платформа', ask: 'Для какой платформы нужен бот?', options: ['Telegram', 'MAX', 'ВКонтакте', 'WhatsApp'] },
+    { label: 'Бизнес / задача', ask: 'Опишите, чем занимается ваш бизнес и какую задачу должен решать бот.', options: ['Салон красоты: нужна запись клиентов', 'Автосервис: нужен приём обращений'] },
+    { label: 'Функции', ask: 'Напишите, какие функции нужны боту.', options: ['Меню услуг и приём заявок', 'Ответы на частые вопросы и запись'] },
+    { label: 'Искусственный интеллект', ask: 'Нужно ли добавить искусственный интеллект?', options: ['Да', 'Нет', 'Пока не знаю'] },
+    { label: 'Интеграции', ask: 'Какие интеграции нужны? Например: CRM, оплата, уведомления.', options: ['Не нужны', 'Уведомления о новых заявках'] },
+    { label: 'Пример похожего бота', ask: 'Есть пример похожего бота?', options: [], optional: true },
+    { label: 'Ориентировочный бюджет', ask: 'Укажите предполагаемый бюджет, если уже определились.', options: ['Пока не определились'], optional: true },
+    { label: 'Желаемые сроки', ask: 'Какой срок разработки предпочитаете?', options: ['В течение месяца', 'Не срочно'], optional: true },
+    { label: 'Контакт для связи', ask: 'Как с вами удобнее связаться?', options: ['@username (пример)'] },
+  ];
+  const total = questions.length;
+  let step = 0;
+  let editing = false;
+  let answers = [];
+  const el = (tag, className, text) => {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+  const button = (text, className, action) => {
+    const b = el('button', className, text);
+    b.type = 'button';
+    b.addEventListener('click', action);
+    return b;
+  };
+  const list = (rows, onEdit) => {
+    const dl = el('dl', 'bw-list');
+    rows.forEach(([label, value, index]) => {
+      const row = el('div');
+      const dd = el('dd', '', value);
+      if (onEdit) {
+        const change = button('Изменить', 'bw-edit', () => onEdit(index));
+        change.setAttribute('aria-label', 'Изменить: ' + label);
+        dd.appendChild(change);
+      }
+      row.append(el('dt', '', label), dd);
+      dl.appendChild(row);
+    });
+    return dl;
+  };
+  function finishRender(focus) {
+    screen.scrollTop = 0;
+    if (focus) replies.querySelector('button')?.focus({ preventScroll: true });
+  }
+  function question(focus) {
+    const q = questions[step];
+    screen.textContent = '';
+    replies.textContent = '';
+    progress.textContent = 'Шаг ' + (step + 1) + ' из ' + total;
+    if (step > 0 && !editing) screen.appendChild(el('p', 'msg from-client', answers[step - 1]));
+    screen.appendChild(el('p', 'msg from-bot', q.ask));
+    q.options.forEach((option) => replies.appendChild(button(option, 'reply', () => answer(option))));
+    if (q.optional) replies.appendChild(button('Пропустить', 'reply', () => answer('—')));
+    if (step > 0) replies.appendChild(button('← Назад', 'reply back', () => {
+      if (editing) { editing = false; review(true); return; }
+      step -= 1;
+      question(true);
+    }));
+    finishRender(focus);
+  }
+  function answer(value) {
+    answers[step] = value;
+    if (editing || step === total - 1) { editing = false; review(true); return; }
+    step += 1;
+    question(true);
+  }
+  function review(focus) {
+    screen.textContent = '';
+    replies.textContent = '';
+    progress.textContent = 'Проверка перед отправкой';
+    screen.appendChild(el('p', 'msg from-bot', 'Проверьте заявку перед отправкой. Можно исправить любой пункт.'));
+    screen.appendChild(list(questions.map((q, i) => [q.label, answers[i], i]), (i) => { step = i; editing = true; question(true); }));
+    replies.appendChild(button('✓ Отправить заявку (демо)', 'reply send', () => done(true)));
+    replies.appendChild(button('← Назад', 'reply back', () => { step = total - 1; question(true); }));
+    finishRender(focus);
+  }
+  function done(focus) {
+    screen.textContent = '';
+    replies.textContent = '';
+    progress.textContent = 'Демонстрация пройдена';
+    screen.appendChild(el('p', 'msg from-bot', 'Заявка принята! Разработчик изучит ТЗ и свяжется с вами по указанному контакту. Стоимость и сроки согласуются отдельно.'));
+    const owner = el('div', 'bw-owner');
+    owner.appendChild(el('b', '', 'Что получает разработчик: новая заявка'));
+    owner.appendChild(list([0, 1, 6, 7, 8].map((i) => [questions[i].label, answers[i], i])));
+    owner.appendChild(el('p', '', 'И полное техническое задание отдельным файлом.'));
+    screen.appendChild(owner);
+    replies.appendChild(button('Пройти ещё раз', 'reply', () => start(true)));
+    finishRender(focus);
+  }
+  function start(focus) {
+    step = 0;
+    editing = false;
+    answers = [];
+    question(focus);
+  }
+  start(false);
+})();
